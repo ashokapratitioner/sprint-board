@@ -1,0 +1,12 @@
+.taskViewContainer {
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.taskViewContainer > * {
+  margin: 10px 0;
+}
+
+.subheading {
+  font-weight: 600;
+}
