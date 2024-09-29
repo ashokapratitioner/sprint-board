@@ -3,7 +3,8 @@ import { getRequests } from "../http/axios";
 
 const getPhotos = async () => {
   const endpoint = "/photos";
-  await getRequests(endpoint);
+  const response = await getRequests(endpoint);
+  return response;
 };
 
 const useQueryHook = (key: string) => {
