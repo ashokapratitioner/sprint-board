@@ -1,22 +1,23 @@
 import { ReactNode } from "react";
+import styles from "./dragdrop.style.module.css";
 
-type DraggableProps = {
+type DroppableProps = {
   id: string;
-  key: string | number;
   children: ReactNode;
 };
 
-export default function DraggableComponent({
-  key,
-  id,
-  children,
-}: DraggableProps) {
+export default function DroppableComponent({ id, children }: DroppableProps) {
   const onDragOver = (e: any) => {
     e.preventDefault();
   };
 
   return (
-    <div id={id} onDragOver={onDragOver} data-testid={"droppable_div_" + key}>
+    <div
+      className={styles.paperContainer}
+      id={id}
+      onDragOver={onDragOver}
+      data-testid={"droppable_div_" + id}
+    >
       {children}
     </div>
   );

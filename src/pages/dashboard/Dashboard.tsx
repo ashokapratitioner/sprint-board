@@ -12,7 +12,11 @@ const Dashboard = () => {
   const { id } = useParams();
   return (
     <>
-      <PaperContainerComponent columns={dashboard} data={tasks} />
+      <PaperContainerComponent
+        columns={dashboard}
+        data={tasks}
+        dragSupport={true}
+      />
       {id && <Outlet />}
     </>
   );

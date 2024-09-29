@@ -2,15 +2,13 @@ import { ReactNode, useState } from "react";
 
 type DraggableProps = {
   id: string;
-  key: string | number;
-  updateDraggableId: (draggableId: number) => void;
+  updateDraggable: (draggableId: number) => void;
   children: ReactNode;
 };
 
 export default function DraggableComponent({
-  key,
   id,
-  updateDraggableId,
+  updateDraggable,
   children,
 }: DraggableProps) {
   const [draggedItemId, setDraggedItemId] = useState(null);
@@ -22,7 +20,7 @@ export default function DraggableComponent({
 
   const onDrop = (e: any) => {
     if (draggedItemId) {
-      updateDraggableId(draggedItemId);
+      updateDraggable && updateDraggable(draggedItemId);
       setDraggedItemId(null);
     }
     e.preventDefault();
@@ -31,7 +29,7 @@ export default function DraggableComponent({
   return (
     <div
       draggable="true"
-      data-testid={"draggable_div_" + key}
+      data-testid={"draggable_div_" + id}
       onDragStart={(e) => onDragStart(e, id)}
       onDrop={(e) => onDrop(e)}
     >
