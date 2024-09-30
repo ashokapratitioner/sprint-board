@@ -1,7 +1,13 @@
 import { Outlet } from "react-router-dom";
+import HeaderComponent from "../components/Layout/HeaderComponent";
 
 const RouterOutlet = () => {
-  return <Outlet />;
+  return (
+    <>
+      <HeaderComponent />
+      <Outlet />
+    </>
+  );
 };
 
 export default RouterOutlet;
