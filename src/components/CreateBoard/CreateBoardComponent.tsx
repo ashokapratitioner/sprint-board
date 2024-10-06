@@ -1,6 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { BOARD_DATA } from "../../config/board";
 import { useBoard } from "../../hooks/useBoard";
 
 const applyAddColumnRule = (options: any) => {
