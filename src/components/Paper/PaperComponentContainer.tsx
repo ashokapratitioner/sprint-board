@@ -24,7 +24,7 @@ const DroppableContainer = ({
 }: DroppableProps): JSX.Element => {
   if (draggable) {
     return (
-      <DroppableComponent id={value}>
+      <DroppableComponent id={value} >
         <PaperPlaceholderComponent title={name} value={value}>
           {children}
         </PaperPlaceholderComponent>

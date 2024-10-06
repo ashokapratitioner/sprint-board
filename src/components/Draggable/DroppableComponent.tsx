@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import styles from "./dragdrop.style.module.css";
 
 type DroppableProps = {
   id: string;
@@ -13,7 +12,7 @@ export default function DroppableComponent({ id, children }: DroppableProps) {
 
   return (
     <div
-      className={styles.paperContainer}
+      className={"droppable"}
       id={id}
       onDragOver={onDragOver}
       data-testid={"droppable_div_" + id}

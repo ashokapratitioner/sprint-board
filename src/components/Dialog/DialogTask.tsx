@@ -19,14 +19,12 @@ const DialogTask = (WrappedComponent: ComponentType<any>) => {
     };
 
     return (
-      <dialog ref={dialogRef}>
-        <h3>Title</h3>
-        <form method="dialog">
+      <dialog ref={dialogRef} className="p-2 rounded">
+        <h3>{props.title ?? "Title"}</h3>
           <WrappedComponent {...props} />
-          <button type="button" onClick={handleClose}>
+          <button  className="w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600 transition duration-200" type="button" onClick={handleClose}>
             Close
           </button>
-        </form>
       </dialog>
     );
   };

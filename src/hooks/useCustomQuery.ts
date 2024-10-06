@@ -7,7 +7,7 @@ const getPhotos = async () => {
   return response;
 };
 
-const useQueryHook = (key: string) => {
+const useCustomQuery = (key: string) => {
   const query = useQuery({
     queryKey: [key],
     queryFn: () => getPhotos(),
@@ -17,4 +17,4 @@ const useQueryHook = (key: string) => {
   return query;
 };
 
-export { useQueryHook };
+export { useCustomQuery };

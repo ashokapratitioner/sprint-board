@@ -6,7 +6,7 @@ type DraggableProps = {
   children: ReactNode;
 };
 
-export default function DraggableComponent({
+export default function DraggableComponentomponent({
   id,
   updateDraggable,
   children,
