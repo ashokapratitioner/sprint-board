@@ -1,5 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
+import { memo, useMemo } from "react";
 
 const applyAddColumnRule = (options: any) => {
   const { boardKeys, index, max = 6, min = 3 } = options;
@@ -18,7 +19,7 @@ const inputClass =
 const buttonClass =
   "w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200";
 
-const CreateBoardComponent = () => {
+const CreateBoardComponent = memo(() => {
   const {
     register,
     unregister,
@@ -26,28 +27,30 @@ const CreateBoardComponent = () => {
     watch,
     formState: { errors },
   } = useForm();
+  const { board, addNewBoardItem, removeThisBoardItem, updateBoardItem, update }= useBoard()
 
-  const { board, addNewBoardItem, removeThisBoardItem }= useBoard()
+  const onSubmit: SubmitHandler<{[key:string]: string}> = () => {
+     update();
+  };
 
-  const onSubmit: SubmitHandler<any> = (data: any) => console.log(data);
-
-  
+  const boardKeys = useMemo(() => Object.keys(board), [board]);
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-5 align-top"
     >
-      {Object.keys(board).map((boardKey: string, i: number) => (
+      {boardKeys.map((boardKey: string, i: number) => (
         <div key={boardKey} className="mb-5">
           <input
             className={inputClass}
             defaultValue={board[boardKey].title}
             id={board[boardKey].id}
             {...register(board[boardKey].id, { required: true })}
+            onChange={(e) => updateBoardItem(e, board[boardKey].id)}
           />
           {errors[board[boardKey].value] && <span>This field is required</span>}
-          {applyAddColumnRule({ boardKeys: Object.keys(board), boardKey, index: i }) && (
+          {applyAddColumnRule({ boardKeys: boardKeys, boardKey, index: i }) && (
             <button
               type="button"
               aria-label="Add a new board item"
@@ -71,6 +74,6 @@ const CreateBoardComponent = () => {
       <button className={buttonClass}>Submit</button>
     </form>
   );
-};
+});
 
 export default CreateBoardComponent;

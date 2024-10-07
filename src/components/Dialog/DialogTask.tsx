@@ -15,6 +15,7 @@ const DialogTask = (WrappedComponent: ComponentType<any>) => {
     const handleClose = () => {
       if (dialogRef.current) {
         dialogRef.current.close();
+        props?.toggleDialog();
       }
     };
 
