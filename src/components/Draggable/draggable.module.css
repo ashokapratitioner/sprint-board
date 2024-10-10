@@ -1,0 +1,29 @@
+.dotsContainer{
+    display: flex;
+    cursor: move;
+
+}
+.dots {
+    transform: rotate(90deg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 18px;
+    margin-left: -11px;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin: 0;
+}
+
+.draggableContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: normal;
+    width: 275px;
+}
