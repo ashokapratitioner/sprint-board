@@ -4,6 +4,9 @@ import { lazy, memo, useMemo } from "react";
 const DraggableComponentomponent = lazy(
   () => import("../Draggable/DraggableComponent")
 );
+const DroppableComponent = lazy(
+  () => import("../Draggable/DroppableComponent")
+);
 
 const applyAddColumnRule = (options: any) => {
   const { boardKeys, index, max = 6, min = 3 } = options;
@@ -49,55 +52,57 @@ const CreateBoardComponent = memo(() => {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-3 align-top"
     >
-      {boardKeys.map((boardKey: string, i: number) => (
-        <DraggableComponentomponent
-          variant="left-dots"
-          key={boardKey}
-          id={boardKey}
-          updateDraggable={() => {}}
-        >
-          <div className="mb-5 w-full">
-            <input
-              className={inputClass}
-              defaultValue={board[boardKey].title}
-              id={board[boardKey].id}
-              {...register(board[boardKey].id, { required: true })}
-              onChange={(e) => updateBoardItem(e, board[boardKey].id)}
-            />
-            {errors[board[boardKey].value] && (
-              <span>This field is required</span>
-            )}
-            {applyAddColumnRule({
-              boardKeys: boardKeys,
-              boardKey,
-              index: i,
-            }) && (
-              <button
-                type="button"
-                aria-label="Add a new board item"
-                onClick={addNewBoardItem}
-              >
-                add
-              </button>
-            )}
-            {applyReduceColumnRule({ board, boardKey }) && (
-              <button
-                type="button"
-                aria-label="Remove a board item"
-                onClick={() =>
-                  removeThisBoardItem(board[boardKey].id, (id) => {
-                    unregister(id);
-                  })
-                }
-              >
-                remove
-              </button>
-            )}
-          </div>
-        </DraggableComponentomponent>
-      ))}
+      <DroppableComponent id="boardContainer" >
+        {boardKeys.map((boardKey: string, i: number) => (
+          <DraggableComponentomponent
+            variant="left-dots"
+            key={boardKey}
+            id={boardKey}
+            updateDraggable={() => {}}
+          >
+            <div className="mb-5 w-full">
+              <input
+                className={inputClass}
+                defaultValue={board[boardKey].title}
+                id={board[boardKey].id}
+                {...register(board[boardKey].id, { required: true })}
+                onChange={(e) => updateBoardItem(e, board[boardKey].id)}
+              />
+              {errors[board[boardKey].value] && (
+                <span>This field is required</span>
+              )}
+              {applyAddColumnRule({
+                boardKeys: boardKeys,
+                boardKey,
+                index: i,
+              }) && (
+                <button
+                  type="button"
+                  aria-label="Add a new board item"
+                  onClick={addNewBoardItem}
+                >
+                  add
+                </button>
+              )}
+              {applyReduceColumnRule({ board, boardKey }) && (
+                <button
+                  type="button"
+                  aria-label="Remove a board item"
+                  onClick={() =>
+                    removeThisBoardItem(board[boardKey].id, (id) => {
+                      unregister(id);
+                    })
+                  }
+                >
+                  remove
+                </button>
+              )}
+            </div>
+          </DraggableComponentomponent>
+        ))}
 
-      <button className={buttonClass}>Submit</button>
+        <button className={buttonClass}>Submit</button>
+      </DroppableComponent>
     </form>
   );
 });
