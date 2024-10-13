@@ -1,12 +1,16 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
 import { lazy, memo, useMemo } from "react";
-const DraggableComponentomponent = lazy(
+const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
 );
 const DroppableComponent = lazy(
   () => import("../Draggable/DroppableComponent")
 );
+
+// const DroppableContainerComponent = lazy(
+//   () => import("../Draggable/DroppableContainerComponent")
+// );
 
 const applyAddColumnRule = (options: any) => {
   const { boardKeys, index, max = 6, min = 3 } = options;
@@ -33,6 +37,7 @@ const CreateBoardComponent = memo(() => {
     watch,
     formState: { errors },
   } = useForm();
+
   const {
     board,
     addNewBoardItem,
@@ -52,9 +57,10 @@ const CreateBoardComponent = memo(() => {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-3 align-top"
     >
+      {/* <DroppableContainerComponent items={"items"} render={(items: any) => <div>{items}</div>} ></DroppableContainerComponent> */}
       <DroppableComponent id="boardContainer" >
         {boardKeys.map((boardKey: string, i: number) => (
-          <DraggableComponentomponent
+          <DraggableComponent
             variant="left-dots"
             key={boardKey}
             id={boardKey}
@@ -98,7 +104,7 @@ const CreateBoardComponent = memo(() => {
                 </button>
               )}
             </div>
-          </DraggableComponentomponent>
+          </DraggableComponent>
         ))}
 
         <button className={buttonClass}>Submit</button>
