@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
-import { lazy, memo, useMemo } from "react";
+import React, { lazy, memo, useMemo, useState } from "react";
 const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
 );
@@ -8,9 +8,14 @@ const DroppableComponent = lazy(
   () => import("../Draggable/DroppableComponent")
 );
 
-// const DroppableContainerComponent = lazy(
-//   () => import("../Draggable/DroppableContainerComponent")
+// const DragDropContainer = lazy(
+//   () => import("../Draggable/DragDropContainer")
 // );
+
+type PlaceholderProps = {
+  id: string;
+  placeholder: () => JSX.Element;
+} 
 
 const applyAddColumnRule = (options: any) => {
   const { boardKeys, index, max = 6, min = 3 } = options;
@@ -30,6 +35,10 @@ const buttonClass =
   "w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200";
 
 const CreateBoardComponent = memo(() => {
+  const [placeHolder, setPlaceHolder] = useState<PlaceholderProps>({
+    id: "",
+    placeholder: () => <></>
+  })
   const {
     register,
     unregister,
@@ -52,19 +61,29 @@ const CreateBoardComponent = memo(() => {
 
   const boardKeys = useMemo(() => Object.keys(board), [board]);
 
+  const insertAfter = (targetId: string, Placeholder: () => JSX.Element) => {
+      setPlaceHolder({
+        id: targetId,
+        placeholder: Placeholder
+      })
+  }
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-3 align-top"
     >
-      {/* <DroppableContainerComponent items={"items"} render={(items: any) => <div>{items}</div>} ></DroppableContainerComponent> */}
-      <DroppableComponent id="boardContainer" >
+      {/* <DragDropContainer placeholderIndex={1} dropIndex={1} items={board} renderItem={(item: any) =>  */}
+        <DroppableComponent id="boardContainer" >
         {boardKeys.map((boardKey: string, i: number) => (
+          <React.Fragment key={boardKey}>
+          {boardKey === placeHolder.id ? <placeHolder.placeholder /> : null}
           <DraggableComponent
             variant="left-dots"
             key={boardKey}
             id={boardKey}
-            updateDraggable={() => {}}
+            index={i}
+            insertAfter={insertAfter}
           >
             <div className="mb-5 w-full">
               <input
@@ -105,10 +124,13 @@ const CreateBoardComponent = memo(() => {
               )}
             </div>
           </DraggableComponent>
+          </React.Fragment>
         ))}
 
         <button className={buttonClass}>Submit</button>
       </DroppableComponent>
+      {/* } /> */}
+      
     </form>
   );
 });

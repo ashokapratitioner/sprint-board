@@ -39,10 +39,10 @@ const DroppableContainer = ({
   }
 };
 
-const DraggableItem = ({ id, draggable, updateDraggable, children }: any) => {
+const DraggableItem = ({ id, draggable, insertAfter, children }: any) => {
   if (draggable) {
     return (
-      <DraggableComponent id={id} updateDraggable={updateDraggable}>
+      <DraggableComponent id={id} insertAfter={insertAfter}>
         <PaperContentComponent key={id}>{children}</PaperContentComponent>
       </DraggableComponent>
     );
@@ -55,7 +55,7 @@ export default function PaperContainerComponent({
   data,
   dragSupport = false,
 }: any) {
-  const updateDraggable = (id: string) => {
+  const insertAfter = (id: string) => {
     console.log(id);
   };
 
@@ -75,7 +75,7 @@ export default function PaperContainerComponent({
                   key={task.id}
                   id={task.id}
                   draggable={dragSupport}
-                  updateDraggable={updateDraggable}
+                  insertAfter={insertAfter}
                 >
                   <TaskQuickView {...task} />
                 </DraggableItem>
