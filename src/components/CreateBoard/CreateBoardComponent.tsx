@@ -1,6 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
-import React, { lazy, memo, useMemo, useState } from "react";
+import React, { lazy, memo, useCallback, useMemo, useRef, useState } from "react";
+import { getPlaceholderMarkup } from "../Draggable/getPlaceholderMarkup";
 const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
 );
@@ -39,6 +40,9 @@ const CreateBoardComponent = memo(() => {
     id: "",
     placeholder: () => <></>
   })
+  const currentDraggable = useRef<string>("");
+  const prevDragOver = useRef<string>("");
+
   const {
     register,
     unregister,
@@ -61,6 +65,49 @@ const CreateBoardComponent = memo(() => {
 
   const boardKeys = useMemo(() => Object.keys(board), [board]);
 
+  const dragStart = useCallback((e: React.DragEvent<HTMLDivElement>, itemId: string) => {
+      currentDraggable.current = itemId;
+      e.dataTransfer.setData(itemId, itemId);
+  }, []);
+
+  const dragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    // const itemId = dragRef.current.id;
+    // reset draggeditemid as required
+  };
+
+  const dragOver = useCallback((e: any, itemId: string) => {
+    const target = e.target;
+    if (
+      target.id === itemId &&
+      currentDraggable.current !== target.id &&
+      prevDragOver.current !== target.id
+    ) {
+      if (target.dataset.testid?.includes("draggable_div_")) {
+        const { width, height } = target.getBoundingClientRect();
+
+        const CustomPlaceholder = ({ onDragOver, onDrop }: any) => (
+          <div
+            id={target.id}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            data-testid={`placeholder_div_${itemId}`}
+            style={{ width, height, border: "3px dashed #000" }}
+          />
+        );
+        const Placeholder = getPlaceholderMarkup(
+          CustomPlaceholder,
+          currentDraggable.current
+        );
+        insertAfter(target.id as string, Placeholder);
+      }
+    }
+    prevDragOver.current = target.id;
+  }, []);
+
+  const dragLeave = useCallback(() => {
+    prevDragOver.current = "";
+  }, []);
+
   const insertAfter = (targetId: string, Placeholder:({ style, id }: any) => JSX.Element) => {
       setPlaceHolder({
         id: targetId,
@@ -80,6 +127,10 @@ const CreateBoardComponent = memo(() => {
           {boardKey === placeHolder.id ? <placeHolder.placeholder  /> : null}
           <DraggableComponent
             variant="left-dots"
+            dragStart={dragStart}
+            dragOver={dragOver}
+            dragEnd={dragEnd}
+            dragLeave={dragLeave}
             key={boardKey}
             id={boardKey}
             index={i}
