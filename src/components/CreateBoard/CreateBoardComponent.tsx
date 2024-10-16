@@ -14,7 +14,7 @@ const DroppableComponent = lazy(
 
 type PlaceholderProps = {
   id: string;
-  placeholder: () => JSX.Element;
+  placeholder: ({ style, id }: any) => JSX.Element;
 } 
 
 const applyAddColumnRule = (options: any) => {
@@ -61,7 +61,7 @@ const CreateBoardComponent = memo(() => {
 
   const boardKeys = useMemo(() => Object.keys(board), [board]);
 
-  const insertAfter = (targetId: string, Placeholder: () => JSX.Element) => {
+  const insertAfter = (targetId: string, Placeholder:({ style, id }: any) => JSX.Element) => {
       setPlaceHolder({
         id: targetId,
         placeholder: Placeholder
@@ -77,7 +77,7 @@ const CreateBoardComponent = memo(() => {
         <DroppableComponent id="boardContainer" >
         {boardKeys.map((boardKey: string, i: number) => (
           <React.Fragment key={boardKey}>
-          {boardKey === placeHolder.id ? <placeHolder.placeholder /> : null}
+          {boardKey === placeHolder.id ? <placeHolder.placeholder  /> : null}
           <DraggableComponent
             variant="left-dots"
             key={boardKey}

@@ -1,10 +1,18 @@
-import { ComponentType, memo, ReactNode, useCallback, useRef, useState } from "react";
+import {
+  ComponentType,
+  memo,
+  ReactNode,
+  useCallback,
+  useRef,
+} from "react";
 import styles from "./draggable.module.css";
-import ReactDOM from 'react-dom/client';
 
 type DraggableProps = {
   id: string;
-  insertAfter: (draggableId: string, Placeholder: () => JSX.Element) => void;
+  insertAfter: (
+    draggableId: string,
+    Placeholder: ({ style, id }: any) => JSX.Element
+  ) => void;
   variant?: string;
   children: ReactNode;
   index?: number;
@@ -12,31 +20,42 @@ type DraggableProps = {
 
 const Dot = memo(() => <div className={styles.dot}></div>);
 
-// const getPlaceholderMarkup = (WrappedComponent: ComponentType<any>) => {
-//   return ({computedStyles}: any) => {
-//     return <WrappedComponent {...computedStyles} />;
-//   }  
-// }; 
+const getPlaceholderMarkup = (
+  WrappedComponent: ComponentType<any>,
+  id: string
+) => {
+  return () => {
+    const dragOver = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+    };
 
-const Dots = memo(({variant}: any) => {
-  return (
-    variant === "left-dots" ? (
-      <div className={styles.dotsContainer}>
-        <div className={styles.dots}>
-          <Dot />
-          <Dot />
-          <Dot />
-          <Dot />
-        </div>
-        <div className={styles.dots}>
-          <Dot />
-          <Dot />
-          <Dot />
-          <Dot />
-        </div>
+    const drop = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const data = e.dataTransfer.getData(id);
+      console.log(data);
+    };
+
+    return <WrappedComponent onDragOver={dragOver} onDrop={drop} />;
+  };
+};
+
+const Dots = memo(({ variant }: any) => {
+  return variant === "left-dots" ? (
+    <div className={styles.dotsContainer}>
+      <div className={styles.dots}>
+        <Dot />
+        <Dot />
+        <Dot />
+        <Dot />
       </div>
-    ) : null
-  );
+      <div className={styles.dots}>
+        <Dot />
+        <Dot />
+        <Dot />
+        <Dot />
+      </div>
+    </div>
+  ) : null;
 });
 
 export default function DraggableComponent({
@@ -50,42 +69,52 @@ export default function DraggableComponent({
   const currentDraggable = useRef<string>("");
   const prevDragOver = useRef<string>("");
 
-  const dragStart = (e: any) => {
+  const dragStart = useCallback((e: any) => {
     if (dragRef.current) {
       const itemId = dragRef.current.id;
       currentDraggable.current = itemId;
       e.dataTransfer.setData(itemId, itemId);
+      console.log(e.dataTransfer);
     }
-  };
+  }, []);
 
   const dragEnd = (e: any) => {
     // const itemId = dragRef.current.id;
     // reset draggeditemid as required
   };
 
-  const dragOver = (e: any, id: string) => {
+  const dragOver = useCallback((e: any, id: string) => {
     const target = e.target;
-    if (target.id === id && (currentDraggable.current !== target.id) && prevDragOver.current !== target.id) {
-      // console.log(prevDragOver.current, target.id);
-      // create a draggable effect and space for visual representation
+    if (
+      target.id === id &&
+      currentDraggable.current !== target.id &&
+      prevDragOver.current !== target.id
+    ) {
       if (target.dataset.testid?.includes("draggable_div_")) {
         const { width, height } = target.getBoundingClientRect();
-       
-        const CustomPlaceholder = () => (
-          <div style={{ width, height, border: '3px dashed #000' }} />
+
+        const CustomPlaceholder = ({ onDragOver, onDrop }: any) => (
+          <div
+            id={target.id}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            data-testid={`placeholder_div_${id}`}
+            style={{ width, height, border: "3px dashed #000" }}
+          />
         );
-        // const Placeholder = getPlaceholderMarkup(CustomPlaceholder);
-        insertAfter((target.id as string), CustomPlaceholder);
-        // dragRef.current?.insertBefore(placeholderDiv, target);
+        const Placeholder = getPlaceholderMarkup(
+          CustomPlaceholder,
+          currentDraggable.current
+        );
+        insertAfter(target.id as string, Placeholder);
       }
-      
     }
     prevDragOver.current = target.id;
-  };
+  }, []);
 
-  const dragLeave = () => {
+  const dragLeave = useCallback(() => {
     prevDragOver.current = "";
-  }
+  }, []);
 
   return (
     <div
