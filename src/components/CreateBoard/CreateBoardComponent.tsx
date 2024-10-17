@@ -1,6 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
-import React, { lazy, memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { forwardRef, lazy, memo, useCallback, useMemo, useRef, useState } from "react";
 import { getPlaceholderMarkup } from "../Draggable/getPlaceholderMarkup";
 const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
@@ -65,9 +65,9 @@ const CreateBoardComponent = memo(() => {
 
   const boardKeys = useMemo(() => Object.keys(board), [board]);
 
-  const dragStart = useCallback((e: React.DragEvent<HTMLDivElement>, itemId: string) => {
+  const dragStart = useCallback((e: any, itemId: string) => {
       currentDraggable.current = itemId;
-      e.dataTransfer.setData(itemId, itemId);
+      e.dataTransfer.setData("text/html", e.target.outerHTML);
   }, []);
 
   const dragEnd = (e: React.DragEvent<HTMLDivElement>) => {
@@ -85,15 +85,16 @@ const CreateBoardComponent = memo(() => {
       if (target.dataset.testid?.includes("draggable_div_")) {
         const { width, height } = target.getBoundingClientRect();
 
-        const CustomPlaceholder = ({ onDragOver, onDrop }: any) => (
+        const CustomPlaceholder = forwardRef(({ onDragOver, onDrop }: any, ref: any) => (
           <div
             id={target.id}
             onDragOver={onDragOver}
             onDrop={onDrop}
+            ref={ref}
             data-testid={`placeholder_div_${itemId}`}
             style={{ width, height, border: "3px dashed #000" }}
           />
-        );
+        ));
         const Placeholder = getPlaceholderMarkup(
           CustomPlaceholder,
           currentDraggable.current

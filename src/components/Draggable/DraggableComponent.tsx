@@ -24,6 +24,7 @@ export default function DraggableComponent({
   const dragOverWrapper = (e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragOver) {
       const itemId = dragRef.current.id;
+      e.dataTransfer.dropEffect = "move";
       dragOver(e, itemId);
     }
   };
