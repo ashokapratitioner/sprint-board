@@ -45,11 +45,11 @@ export const useBoard = () => {
     [board]
   );
 
-  const update = () => {
+  const saveToStorage = () => {
     localStorage.setItem("user.offline.board", JSON.stringify(board));
   };
 
-  const updateBoardItem = (
+  const updateThisItem = (
     e: React.ChangeEvent<HTMLInputElement>,
     id: string
   ) => {
@@ -65,11 +65,20 @@ export const useBoard = () => {
     }));
   };
 
+  const updateBoard = (itemsOrder: string[]) => {
+    const sortedBoard = itemsOrder.reduce((acc, item) => {
+      acc[item] = board[item];
+      return acc;
+    }, {} as TypeBoardData);
+    setBoard(sortedBoard);
+  };
+
   return {
     board,
     addNewBoardItem,
     removeThisBoardItem,
-    updateBoardItem,
-    update,
+    updateThisItem,
+    updateBoard,
+    saveToStorage,
   };
 };

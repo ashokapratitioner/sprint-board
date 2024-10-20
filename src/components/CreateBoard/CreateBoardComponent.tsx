@@ -1,7 +1,16 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
-import React, { forwardRef, lazy, memo, useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  lazy,
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { getPlaceholderMarkup } from "../Draggable/getPlaceholderMarkup";
+
 const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
 );
@@ -16,7 +25,7 @@ const DroppableComponent = lazy(
 type PlaceholderProps = {
   id: string;
   placeholder: ({ style, id }: any) => JSX.Element;
-} 
+};
 
 const applyAddColumnRule = (options: any) => {
   const { boardKeys, index, max = 6, min = 3 } = options;
@@ -25,8 +34,8 @@ const applyAddColumnRule = (options: any) => {
 };
 
 const applyReduceColumnRule = (options: any) => {
-  const { board, boardKey } = options;
-  return board?.[boardKey]?.delete;
+  const { min = 3, index } = options;
+  return index >= min;
 };
 
 const inputClass =
@@ -38,8 +47,8 @@ const buttonClass =
 const CreateBoardComponent = memo(() => {
   const [placeHolder, setPlaceHolder] = useState<PlaceholderProps>({
     id: "",
-    placeholder: () => <></>
-  })
+    placeholder: () => <></>,
+  });
   const currentDraggable = useRef<string>("");
   const prevDragOver = useRef<string>("");
 
@@ -55,24 +64,35 @@ const CreateBoardComponent = memo(() => {
     board,
     addNewBoardItem,
     removeThisBoardItem,
-    updateBoardItem,
-    update,
+    updateThisItem,
+    updateBoard,
+    saveToStorage,
   } = useBoard();
 
   const onSubmit: SubmitHandler<{ [key: string]: string }> = () => {
-    update();
+    saveToStorage();
   };
 
   const boardKeys = useMemo(() => Object.keys(board), [board]);
 
   const dragStart = useCallback((e: any, itemId: string) => {
-      currentDraggable.current = itemId;
-      e.dataTransfer.setData("text/html", e.target.outerHTML);
+    currentDraggable.current = itemId;
+    e.dataTransfer.setData("text/plain", e.target.id);
   }, []);
 
-  const dragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    // const itemId = dragRef.current.id;
-    // reset draggeditemid as required
+  const dragEnd = (e: React.DragEvent<HTMLDivElement>, itemId: string) => {
+    const element = document.getElementById(itemId);
+    if (element) {
+      const parentNode = element.parentNode as HTMLDivElement;
+      const elementIds = Array.from(parentNode.children)
+        .filter(
+          (child) =>
+            child.tagName === "DIV" &&
+            child.matches('[data-testid^="draggable_div_"]')
+        )
+        .map((div) => div.id);
+      updateBoard(elementIds);
+    }
   };
 
   const dragOver = useCallback((e: any, itemId: string) => {
@@ -85,21 +105,23 @@ const CreateBoardComponent = memo(() => {
       if (target.dataset.testid?.includes("draggable_div_")) {
         const { width, height } = target.getBoundingClientRect();
 
-        const CustomPlaceholder = forwardRef(({ onDragOver, onDrop }: any, ref: any) => (
-          <div
-            id={target.id}
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-            ref={ref}
-            data-testid={`placeholder_div_${itemId}`}
-            style={{ width, height, border: "3px dashed #000" }}
-          />
-        ));
+        const CustomPlaceholder = forwardRef(
+          ({ onDragOver, onDrop }: any, ref: any) => (
+            <div
+              id={target.id}
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+              ref={ref}
+              data-testid={`placeholder_div_${itemId}`}
+              style={{ width, height, border: "3px dashed #000" }}
+            />
+          )
+        );
         const Placeholder = getPlaceholderMarkup(
           CustomPlaceholder,
           currentDraggable.current
         );
-        insertAfter(target.id as string, Placeholder);
+        insertPlaceholder(target.id as string, Placeholder);
       }
     }
     prevDragOver.current = target.id;
@@ -109,80 +131,80 @@ const CreateBoardComponent = memo(() => {
     prevDragOver.current = "";
   }, []);
 
-  const insertAfter = (targetId: string, Placeholder:({ style, id }: any) => JSX.Element) => {
-      setPlaceHolder({
-        id: targetId,
-        placeholder: Placeholder
-      })
-  }
+  const insertPlaceholder = (
+    targetId: string,
+    Placeholder: ({ style, id }: any) => JSX.Element
+  ) => {
+    setPlaceHolder({
+      id: targetId,
+      placeholder: Placeholder,
+    });
+  };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col p-3 align-top"
     >
-      {/* <DragDropContainer placeholderIndex={1} dropIndex={1} items={board} renderItem={(item: any) =>  */}
-        <DroppableComponent id="boardContainer" >
+      <DroppableComponent id="boardContainer">
         {boardKeys.map((boardKey: string, i: number) => (
           <React.Fragment key={boardKey}>
-          {boardKey === placeHolder.id ? <placeHolder.placeholder  /> : null}
-          <DraggableComponent
-            variant="left-dots"
-            dragStart={dragStart}
-            dragOver={dragOver}
-            dragEnd={dragEnd}
-            dragLeave={dragLeave}
-            key={boardKey}
-            id={boardKey}
-            index={i}
-            insertAfter={insertAfter}
-          >
-            <div className="mb-5 w-full">
-              <input
-                className={inputClass}
-                defaultValue={board[boardKey].title}
-                id={board[boardKey].id}
-                {...register(board[boardKey].id, { required: true })}
-                onChange={(e) => updateBoardItem(e, board[boardKey].id)}
-              />
-              {errors[board[boardKey].value] && (
-                <span>This field is required</span>
-              )}
-              {applyAddColumnRule({
-                boardKeys: boardKeys,
-                boardKey,
-                index: i,
-              }) && (
-                <button
-                  type="button"
-                  aria-label="Add a new board item"
-                  onClick={addNewBoardItem}
-                >
-                  add
-                </button>
-              )}
-              {applyReduceColumnRule({ board, boardKey }) && (
-                <button
-                  type="button"
-                  aria-label="Remove a board item"
-                  onClick={() =>
-                    removeThisBoardItem(board[boardKey].id, (id) => {
-                      unregister(id);
-                    })
-                  }
-                >
-                  remove
-                </button>
-              )}
-            </div>
-          </DraggableComponent>
+            {boardKey === placeHolder.id ? <placeHolder.placeholder /> : <></>}
+            <DraggableComponent
+              variant="left-dots"
+              dragStart={dragStart}
+              dragOver={dragOver}
+              dragEnd={dragEnd}
+              dragLeave={dragLeave}
+              key={boardKey}
+              id={boardKey}
+              index={i}
+              insertPlaceholder={insertPlaceholder}
+            >
+              <div className="mb-5 w-full">
+                <input
+                  className={inputClass}
+                  defaultValue={board[boardKey].title}
+                  id={board[boardKey].id}
+                  {...register(board[boardKey].id, { required: true })}
+                  onChange={(e) => updateThisItem(e, board[boardKey].id)}
+                />
+                {errors[board[boardKey].value] && (
+                  <span>This field is required</span>
+                )}
+                {applyAddColumnRule({
+                  boardKeys,
+                  boardKey,
+                  index: i,
+                }) && (
+                  <button
+                    type="button"
+                    aria-label="Add a new board item"
+                    onClick={addNewBoardItem}
+                  >
+                    add
+                  </button>
+                )}
+                {applyReduceColumnRule({ index: i }) && (
+                  <button
+                    type="button"
+                    aria-label="Remove a board item"
+                    onClick={() =>
+                      removeThisBoardItem(board[boardKey].id, (id) => {
+                        unregister(id);
+                      })
+                    }
+                  >
+                    remove
+                  </button>
+                )}
+              </div>
+            </DraggableComponent>
           </React.Fragment>
         ))}
 
         <button className={buttonClass}>Submit</button>
       </DroppableComponent>
-      {/* } /> */}
-      
     </form>
   );
 });

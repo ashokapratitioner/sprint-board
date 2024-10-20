@@ -24,7 +24,7 @@ const DroppableContainer = ({
 }: DroppableProps): JSX.Element => {
   if (draggable) {
     return (
-      <DroppableComponent id={value} >
+      <DroppableComponent id={value}>
         <PaperPlaceholderComponent title={name} value={value}>
           {children}
         </PaperPlaceholderComponent>
@@ -39,10 +39,10 @@ const DroppableContainer = ({
   }
 };
 
-const DraggableItem = ({ id, draggable, insertAfter, children }: any) => {
+const DraggableItem = ({ id, draggable, insertPlaceholder, children }: any) => {
   if (draggable) {
     return (
-      <DraggableComponent id={id} insertAfter={insertAfter}>
+      <DraggableComponent id={id} insertPlaceholder={insertPlaceholder}>
         <PaperContentComponent key={id}>{children}</PaperContentComponent>
       </DraggableComponent>
     );
@@ -55,7 +55,7 @@ export default function PaperContainerComponent({
   data,
   dragSupport = false,
 }: any) {
-  const insertAfter = (id: string) => {
+  const insertPlaceholder = (id: string) => {
     console.log(id);
   };
 
@@ -75,7 +75,7 @@ export default function PaperContainerComponent({
                   key={task.id}
                   id={task.id}
                   draggable={dragSupport}
-                  insertAfter={insertAfter}
+                  insertPlaceholder={insertPlaceholder}
                 >
                   <TaskQuickView {...task} />
                 </DraggableItem>
