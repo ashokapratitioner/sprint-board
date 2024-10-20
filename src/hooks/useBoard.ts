@@ -3,6 +3,8 @@ import { BOARD_DATA } from "../config/board";
 import { TypeBoardData } from "../types/board";
 
 export const useBoard = () => {
+  let removedItem = "";
+
   const init = useCallback(() => {
     let boardData: TypeBoardData;
     const storage = localStorage.getItem("user.offline.board");
@@ -16,8 +18,8 @@ export const useBoard = () => {
 
   const [board, setBoard] = useState<typeof BOARD_DATA>(init());
 
-  const addNewBoardItem = useCallback(() => {
-    const key = "item" + (Object.keys(board)?.length + 1);
+  const addNewBoardItem = useCallback((callback: () => void) => {
+    const key = removedItem ? removedItem : "item" + (Object.keys(board)?.length + 1);
     const newItem = {
       id: key,
       title: "",
@@ -29,10 +31,15 @@ export const useBoard = () => {
       ...prevBoard,
       [key]: newItem,
     }));
+
+    if(callback){
+      callback();
+    }
   }, [board]);
 
   const removeThisBoardItem = useCallback(
     (id: string, callback: (id: string) => void) => {
+      removedItem = id;
       setBoard((prevBoard) => {
         const updatedBoard = { ...prevBoard };
         if (callback) {

@@ -180,7 +180,12 @@ const CreateBoardComponent = memo(() => {
                   <button
                     type="button"
                     aria-label="Add a new board item"
-                    onClick={addNewBoardItem}
+                    onClick={() => addNewBoardItem(() => {
+                      setPlaceHolder({
+                        id: "",
+                        placeholder: () => <></>
+                      })
+                    })}
                   >
                     add
                   </button>
