@@ -1,41 +1,34 @@
-import { useCallback, useMemo, useState } from "react";
-import { BOARD_DATA } from "../config/board";
-import { TypeBoardData } from "../types/board";
+import { useCallback, useContext } from "react";
+import { BoardStateType, TypeBoardData } from "../types/board";
+import { BoardContext } from "../context/BoardContext";
 
 export const useBoard = () => {
+  const { board, setBoard } = useContext<TypeBoardData>(BoardContext);
   let removedItem = "";
 
-  const init = useCallback(() => {
-    let boardData: TypeBoardData;
-    const storage = localStorage.getItem("user.offline.board");
-    if (storage) {
-      boardData = JSON.parse(storage || "{}");
-    } else {
-      boardData = BOARD_DATA;
-    }
-    return boardData;
-  }, []);
+  const addNewBoardItem = useCallback(
+    (callback: () => void) => {
+      const key = removedItem
+        ? removedItem
+        : "item" + (Object.keys(board)?.length + 1);
+      const newItem = {
+        id: key,
+        title: "",
+        value: "",
+        delete: true,
+      };
 
-  const [board, setBoard] = useState<typeof BOARD_DATA>(init());
+      setBoard((prevBoard) => ({
+        ...prevBoard,
+        [key]: newItem,
+      }));
 
-  const addNewBoardItem = useCallback((callback: () => void) => {
-    const key = removedItem ? removedItem : "item" + (Object.keys(board)?.length + 1);
-    const newItem = {
-      id: key,
-      title: "",
-      value: "",
-      delete: true,
-    };
-
-    setBoard((prevBoard) => ({
-      ...prevBoard,
-      [key]: newItem,
-    }));
-
-    if(callback){
-      callback();
-    }
-  }, [board]);
+      if (callback) {
+        callback();
+      }
+    },
+    [board]
+  );
 
   const removeThisBoardItem = useCallback(
     (id: string, callback: (id: string) => void) => {
@@ -76,7 +69,7 @@ export const useBoard = () => {
     const sortedBoard = itemsOrder.reduce((acc, item) => {
       acc[item] = board[item];
       return acc;
-    }, {} as TypeBoardData);
+    }, {} as BoardStateType);
     setBoard(sortedBoard);
   };
 

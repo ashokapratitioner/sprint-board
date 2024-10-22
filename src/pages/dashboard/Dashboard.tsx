@@ -1,7 +1,6 @@
 import { Outlet, useParams } from "react-router-dom";
 import PaperContainerComponent from "../../components/Paper/PaperComponentContainer";
 import { tasks } from "../../data/tasks";
-import { useAuth0 } from "@auth0/auth0-react";
 
 const dashboard = [
   { name: "To dos", value: "todo", order: 0 },

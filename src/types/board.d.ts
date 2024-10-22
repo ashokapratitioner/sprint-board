@@ -1,6 +1,4 @@
-// type  { board: Array<BoardItem>, index: number, max: number, min: number }
-
-export type TypeBoardData = {
+export type BoardStateType = {
   [key: string]: {
     id: string;
     title: string;
@@ -8,3 +6,9 @@ export type TypeBoardData = {
     delete: boolean;
   };
 };
+
+type TypeBoardData = {
+  board: BoardStateType;
+  setBoard: React.Dispatch<React.SetStateAction<BoardStateType>>;
+};
+

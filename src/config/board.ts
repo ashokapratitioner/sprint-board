@@ -1,6 +1,6 @@
-import { TypeBoardData } from "../types/board";
+import { BoardStateType } from "../types/board";
 
-export const BOARD_DATA: TypeBoardData = {
+export const BOARD_DATA: BoardStateType = {
   item1: {
     id: "item1",
     title: "To do",

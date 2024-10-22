@@ -4,6 +4,7 @@ import RouterProviderExtended from "./router/RouteProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { getConfig } from "./config";
 import { createBrowserHistory } from "history";
+import BoardContextProvider from "./context/BoardContext";
 
 const history = createBrowserHistory();
 
@@ -30,9 +31,11 @@ const providerConfig = {
 function App() {
   return (
     <Auth0Provider {...providerConfig}>
-      <QueryClientProvider client={queryClient}>
-        <RouterProviderExtended />
-      </QueryClientProvider>
+      <BoardContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProviderExtended />
+        </QueryClientProvider>
+      </BoardContextProvider>
     </Auth0Provider>
   );
 }
