@@ -31,11 +31,9 @@ const providerConfig = {
 function App() {
   return (
     <Auth0Provider {...providerConfig}>
-      <BoardContextProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProviderExtended />
         </QueryClientProvider>
-      </BoardContextProvider>
     </Auth0Provider>
   );
 }

@@ -73,8 +73,23 @@ export const useBoard = () => {
     setBoard(sortedBoard);
   };
 
+  const getKeys = (data: BoardStateType) => {
+    return Object.keys(data);
+  };
+
+  const getBoardAsArray = (data: BoardStateType) => {
+    const result = [];
+    for (const key in data) {
+      result.push(data[key]);
+    }
+
+    return result;
+  };
+
   return {
     board,
+    getKeys,
+    getBoardAsArray,
     addNewBoardItem,
     removeThisBoardItem,
     updateThisItem,

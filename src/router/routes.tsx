@@ -2,6 +2,7 @@ import RouterOutlet from "./RouterOutlet";
 import DialogTask from "../components/Dialog/DialogTask";
 import { lazy } from "react";
 import ProtectedRoute from "./ProtectedRoute";
+import ErrorBoundary from "../components/ErrorHandler/ErrorhandlerComponent";
 
 const Home = lazy(() => import("../pages/home/Home"))
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
@@ -12,7 +13,7 @@ export const routes = [
   {
     path: "/",
     element: <RouterOutlet />,
-    errorElement: <div>404</div>,
+    errorElement: <ErrorBoundary />,
     children: [
       { index: true,  element: <Home /> },
       { path: "home", element: <Home /> },
