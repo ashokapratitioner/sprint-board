@@ -1,11 +1,11 @@
-export type BoardStateType = {
-  [key: string]: {
-    id: string;
-    title: string;
-    value: string;
-    delete: boolean;
-  };
-};
+export type BoardItemType = {
+  id: string;
+  title: string;
+  value: string;
+  delete: boolean;
+}
+export type BoardStateType = Record<string, BoardItemType>;
+
 
 type TypeBoardData = {
   board: BoardStateType;

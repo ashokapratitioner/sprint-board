@@ -27,7 +27,7 @@ type TypeDragStart = (
   itemId: string
 ) => void;
 
-type TypeDragEnd = (e: React.DragEvent<HTMLDivElement>, itemId: string) => void;
+type TypeDragEnd = (e: React.DragEvent<HTMLDivElement>, elementIds: string[]) => void;
 
 type TypeDragOver = (
   e: React.DragEvent<HTMLDivElement>,

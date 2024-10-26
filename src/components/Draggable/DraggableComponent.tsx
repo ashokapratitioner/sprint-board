@@ -18,6 +18,7 @@ export default function DraggableComponent({
   const dragStartWrapper = (e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragStart) {
       const itemId = dragRef.current.id;
+      e.dataTransfer.setData("text/plain", itemId);
       dragStart(e, itemId);
     }
   };
@@ -33,7 +34,19 @@ export default function DraggableComponent({
   const dragEndWrapper = (e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragEnd) {
       const itemId = dragRef.current.id;
-      dragEnd(e, itemId);
+      const element = document.getElementById(itemId);
+      if (element) {
+        const parentNode = element.parentNode as HTMLDivElement;
+        const elementIds = Array.from(parentNode.children)
+          .filter(
+            (child) =>
+              child.tagName === "DIV" &&
+              child.matches('[data-testid^="draggable_div_"]')
+          )
+          .map((div) => div.id);
+          dragEnd(e, elementIds);
+      }
+      
     }
   };
 
