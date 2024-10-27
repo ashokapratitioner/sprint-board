@@ -4,10 +4,11 @@ import { memo } from "react";
 import DragDropContainer from "../Draggable/DragDropContainer";
 import { BoardItemType } from "../../types/board";
 
+
 const applyAddColumnRule = (options: any) => {
-  const { boardKeys, index, max = 6, min = 3 } = options;
-  const boardLength = boardKeys?.length;
-  return boardLength >= min && index === boardLength - 1 && index + 1 < max;
+  const { itemKeys, itemIndex, max = 6, min = 3 } = options;
+  const itemLength = itemKeys?.length;
+  return itemLength >= min && itemIndex === itemLength - 1 && itemIndex + 1 < max;
 };
 
 const applyReduceColumnRule = (options: any) => {
@@ -56,18 +57,19 @@ const CreateBoardComponent = memo(() => {
               <input
                 className={inputClass}
                 defaultValue={item[itemKey].title}
-                id={item[itemKey].id}
-                {...register(item[itemKey].id, { required: true })}
-                onChange={(e) => updateThisItem(e, item[itemKey].id)}
+                id={itemKey}
+                {...register(itemKey, { required: true })}
+                onChange={(e) => updateThisItem(e, itemKey)}
               />
-              {errors[item[itemKey].id] && <span>This field is required</span>}
-              {applyAddColumnRule({ itemKeys, itemKey, index: itemIndex }) && (
+              {errors[itemKey] && <span>This field is required</span>}
+              {applyAddColumnRule({ itemKeys, itemKey, itemIndex }) && (
                 <button
                   type="button"
                   aria-label="Add a new board item"
                   onClick={() =>
-                    addNewBoardItem(() => {
+                    addNewBoardItem((id) => {
                       setPlaceHolder({ id: "", placeholder: () => <></> });
+                      register(id);
                     })
                   }
                 >
@@ -79,7 +81,7 @@ const CreateBoardComponent = memo(() => {
                   type="button"
                   aria-label="Remove a board item"
                   onClick={() =>
-                    removeThisBoardItem(item[itemKey].id, (id) => {
+                    removeThisBoardItem(itemKey, (id) => {
                       unregister(id);
                     })
                   }

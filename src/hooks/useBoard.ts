@@ -7,7 +7,7 @@ export const useBoard = () => {
   let removedItem = "";
 
   const addNewBoardItem = useCallback(
-    (callback: () => void) => {
+    (callback: (id:string) => void) => {
       const key = removedItem
         ? removedItem
         : "item" + (Object.keys(board)?.length + 1);
@@ -24,23 +24,23 @@ export const useBoard = () => {
       }));
 
       if (callback) {
-        callback();
+        callback(key);
       }
     },
     [board]
   );
 
   const removeThisBoardItem = useCallback(
-    (id: string, callback: (id: string) => void) => {
-      removedItem = id;
+    (itemKey: string, callback: (id: string) => void) => {
+      removedItem = itemKey;
       setBoard((prevBoard) => {
         const updatedBoard = { ...prevBoard };
-        if (callback) {
-          callback(id);
-        }
-        delete updatedBoard[id];
+        delete updatedBoard[itemKey];
         return updatedBoard;
       });
+      if (callback) {
+        callback(itemKey);
+      }
     },
     [board]
   );
@@ -51,17 +51,17 @@ export const useBoard = () => {
 
   const updateThisItem = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: string
+    itemKey: string
   ) => {
     const value = e.target.value;
     const updatedItem = {
-      ...board[id],
+      ...board[itemKey],
       title: value,
       value: value?.toLowerCase()?.replace(/ /g, "-"),
     };
     setBoard((prevBoard) => ({
       ...prevBoard,
-      [id]: updatedItem,
+      [itemKey]: updatedItem,
     }));
   };
 
