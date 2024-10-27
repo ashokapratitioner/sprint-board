@@ -1,14 +1,14 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { routes } from "./routes";
-import BoardContextProvider from "../context/BoardContext";
+import DragDropContextProvider from "../context/BoardContext";
 
 const router = createBrowserRouter(routes);
 
 const RouterProviderExtended = () => {
   return (
-    <BoardContextProvider>
+    <DragDropContextProvider>
       <RouterProvider router={router} />
-    </BoardContextProvider>
+    </DragDropContextProvider>
   );
 };
 

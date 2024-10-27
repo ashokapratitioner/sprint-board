@@ -12,6 +12,7 @@ const Dashboard = () => {
   
   const dashboard = getBoardAsArray(board);
   
+
   return (
     <>
       <PaperContainerComponent

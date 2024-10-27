@@ -1,6 +1,7 @@
 import React, {
   forwardRef,
   lazy,
+  Suspense,
   useCallback,
   useMemo,
   useRef,
@@ -33,7 +34,7 @@ interface DragDropContainerProps<T> {
   ) => JSX.Element;
 }
 
-const  DragDropContainer = <T,>({
+const DragDropContainer = <T,>({
   children,
   updatedItems,
   items,
@@ -101,28 +102,32 @@ const  DragDropContainer = <T,>({
   const itemsKeys = useMemo(() => Object.keys(items), [items]);
 
   return (
-    <DroppableComponent id="boardContainer">
-      {itemsKeys.map((itemKey: string, itemIndex: number) => (
-        <React.Fragment key={itemKey}>
-          {itemKey === placeHolder.id ? <placeHolder.placeholder /> : <></>}
-          <DraggableComponent
-            variant="left-dots"
-            dragStart={dragStart}
-            dragOver={dragOver}
-            dragEnd={dragEnd}
-            dragLeave={dragLeave}
-            key={itemKey}
-            id={itemKey}
-            index={itemIndex}
-            insertPlaceholder={insertPlaceholder}
-          >
-            {render(items, itemsKeys, itemKey, itemIndex, setPlaceHolder)}
-          </DraggableComponent>
-        </React.Fragment>
-      ))}
-      {children}
-    </DroppableComponent>
+    <Suspense fallback="loading...">
+      <DroppableComponent id="boardContainer">
+        {itemsKeys.map((itemKey: string, itemIndex: number) => (
+          <React.Fragment key={itemKey}>
+            {itemKey === placeHolder.id ? <placeHolder.placeholder /> : <></>}
+            <Suspense fallback="loading...">
+              <DraggableComponent
+                variant="left-dots"
+                dragStart={dragStart}
+                dragOver={dragOver}
+                dragEnd={dragEnd}
+                dragLeave={dragLeave}
+                key={itemKey}
+                id={itemKey}
+                index={itemIndex}
+                insertPlaceholder={insertPlaceholder}
+              >
+                {render(items, itemsKeys, itemKey, itemIndex, setPlaceHolder)}
+              </DraggableComponent>
+            </Suspense>
+          </React.Fragment>
+        ))}
+        {children}
+      </DroppableComponent>
+    </Suspense>
   );
-}
+};
 
-export default DragDropContainer
+export default DragDropContainer;

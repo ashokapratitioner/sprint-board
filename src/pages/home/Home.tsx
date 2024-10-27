@@ -1,11 +1,11 @@
 import { lazy, Suspense, useCallback, useState } from "react";
 import DialogTask from "../../components/Dialog/DialogTask";
 
-const CreateBoardComponent = lazy(
-  () => import("../../components/CreateBoard/CreateBoardComponent")
+const BoardComponent = lazy(
+  () => import("../../components/Board/BoardComponent")
 );
 
-const DialogBoardComponent = DialogTask(CreateBoardComponent);
+const DialogBoardComponent = DialogTask(BoardComponent);
 
 const buttonStyle =
   "w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200";

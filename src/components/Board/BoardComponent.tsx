@@ -22,7 +22,7 @@ const inputClass =
 const buttonClass =
   "w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200";
 
-const CreateBoardComponent = memo(() => {
+const BoardComponent = memo(() => {
   const {
     register,
     unregister,
@@ -99,4 +99,4 @@ const CreateBoardComponent = memo(() => {
   );
 });
 
-export default CreateBoardComponent;
+export default BoardComponent;

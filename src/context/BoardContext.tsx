@@ -16,7 +16,7 @@ const init = () => {
 
 export const BoardContext = createContext({} as TypeBoardData);
 
-const BoardContextProvider = ({ children }: { children: ReactNode }) => {
+const DragDropContextProvider = ({ children }: { children: ReactNode }) => {
   const [board, setBoard] = useState(init());
 
   return (
@@ -26,4 +26,4 @@ const BoardContextProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default BoardContextProvider;
+export default DragDropContextProvider;
