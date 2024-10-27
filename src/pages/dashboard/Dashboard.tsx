@@ -1,8 +1,9 @@
 import { Outlet, useParams } from "react-router-dom";
-import PaperContainerComponent from "../../components/Paper/PaperComponentContainer";
 import { tasks } from "../../data/tasks";
 import { useBoard } from "../../hooks/useBoard";
+import { lazy, memo } from "react";
 
+const PaperContainerComponent = lazy(() => import("../../components/Paper/PaperComponentContainer"));
 
 const Dashboard = () => {
   const { id } = useParams();
@@ -11,8 +12,6 @@ const Dashboard = () => {
   
   const dashboard = getBoardAsArray(board);
   
- 
-
   return (
     <>
       <PaperContainerComponent
@@ -25,4 +24,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);

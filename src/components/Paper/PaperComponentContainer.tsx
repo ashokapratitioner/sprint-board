@@ -61,11 +61,11 @@ export default function PaperContainerComponent({
 
   return (
     <div className={styles.paperContainer} data-testid="paper-container">
-      {columns.map(({ name, value }: any) => (
+      {columns.map(({ title, value }: any) => (
         <DroppableContainer
           key={value}
           value={value}
-          name={name}
+          name={title}
           draggable={dragSupport}
         >
           {data?.map(
