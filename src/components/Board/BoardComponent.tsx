@@ -68,7 +68,7 @@ const BoardComponent = memo(() => {
                   aria-label="Add a new board item"
                   onClick={() =>
                     addNewBoardItem((id) => {
-                      setPlaceHolder({ id: "", placeholder: () => <></> });
+                      setPlaceHolder({ id: "", placeholder: () => <></>, direction: "top" });
                       register(id);
                     })
                   }

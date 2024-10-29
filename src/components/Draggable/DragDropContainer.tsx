@@ -19,6 +19,7 @@ const DroppableComponent = lazy(
 type PlaceholderProps = {
   id: string;
   placeholder: ({ style, id }: any) => JSX.Element;
+  direction: string;
 };
 
 interface DragDropContainerProps<T> {
@@ -43,6 +44,7 @@ const DragDropContainer = <T,>({
   const [placeHolder, setPlaceHolder] = useState<PlaceholderProps>({
     id: "",
     placeholder: () => <></>,
+    direction: "top"
   });
   const currentDraggable = useRef<string>("");
   const prevDragOver = useRef<string>("");
@@ -62,8 +64,7 @@ const DragDropContainer = <T,>({
     const target = e.target;
     if (currentDraggable.current !== target.id) {
       if (target.dataset.testid?.includes("draggable_div_")) {
-        const { width, height } = target.getBoundingClientRect();
-
+        const { width, height } = target.getBoundingClientRect();        
         const CustomPlaceholder = forwardRef(
           ({ onDragOver, onDrop }: any, ref: any) => (
             <div
@@ -89,6 +90,12 @@ const DragDropContainer = <T,>({
     prevDragOver.current = "";
   }, []);
 
+  const getDirection = useCallback((placeholderId: string, draggableId: string) => {        
+        const placeholderIndex = itemsKeys?.findIndex(key => key === placeholderId);
+        const draggableIndex = itemsKeys?.findIndex(key => key === draggableId);
+        return draggableIndex > placeholderIndex ? "top" : "bottom";
+  }, [])
+
   const insertPlaceholder = (
     targetId: string,
     Placeholder: ({ style, id }: any) => JSX.Element
@@ -96,6 +103,7 @@ const DragDropContainer = <T,>({
     setPlaceHolder({
       id: targetId,
       placeholder: Placeholder,
+      direction: getDirection(targetId, currentDraggable.current)
     });
   };
 
@@ -106,7 +114,7 @@ const DragDropContainer = <T,>({
       <DroppableComponent id="boardContainer">
         {itemsKeys.map((itemKey: string, itemIndex: number) => (
           <React.Fragment key={itemKey}>
-            {itemKey === placeHolder.id ? <placeHolder.placeholder /> : <></>}
+            {itemKey === placeHolder.id && placeHolder.direction === "top" ? <placeHolder.placeholder /> : <></>}
             <Suspense fallback="loading...">
               <DraggableComponent
                 variant="left-dots"
@@ -122,6 +130,7 @@ const DragDropContainer = <T,>({
                 {render(items, itemsKeys, itemKey, itemIndex, setPlaceHolder)}
               </DraggableComponent>
             </Suspense>
+            {itemKey === placeHolder.id && placeHolder.direction === "bottom" ? <placeHolder.placeholder /> : <></>}
           </React.Fragment>
         ))}
         {children}

@@ -44,9 +44,8 @@ export default function DraggableComponent({
               child.matches('[data-testid^="draggable_div_"]')
           )
           .map((div) => div.id);
-          dragEnd(e, elementIds);
+        dragEnd(e, elementIds);
       }
-      
     }
   };
 

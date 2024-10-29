@@ -7,9 +7,6 @@ export const getPlaceholderMarkup = (
 ) => {
   return () => {
     const tarRef = useRef<HTMLDivElement>(null);
-    // const [order, setOrder] = useState<string[]>([])
-
-    console.log("Rendered");
 
     const dragOver = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -20,6 +17,7 @@ export const getPlaceholderMarkup = (
       const data = e.dataTransfer.getData("text/plain");
       if (tarRef.current && data && tarRef?.current.id !== id) {
         const element = document.getElementById(data);
+
         if (element) {
           const parentNode = tarRef.current.parentNode as HTMLDivElement;
           parentNode.replaceChild(element, tarRef.current);
