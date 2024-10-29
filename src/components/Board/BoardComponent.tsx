@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
 import { memo } from "react";
-import DragDropContainer from "../Draggable/DragDropContainer";
+import DragDropContainer, { initPlaholderState } from "../Draggable/DragDropContainer";
 import { BoardItemType } from "../../types/board";
 
 
@@ -68,7 +68,7 @@ const BoardComponent = memo(() => {
                   aria-label="Add a new board item"
                   onClick={() =>
                     addNewBoardItem((id) => {
-                      setPlaceHolder({ id: "", placeholder: () => <></>, direction: "top" });
+                      setPlaceHolder(initPlaholderState);
                       register(id);
                     })
                   }

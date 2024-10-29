@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import styles from "./draggable.module.css";
 import Dots from "./Dots";
 import { DraggableProps } from "./model";
@@ -15,23 +15,23 @@ export default function DraggableComponent({
 }: DraggableProps) {
   const dragRef = useRef<HTMLDivElement>(null);
 
-  const dragStartWrapper = (e: React.DragEvent<HTMLDivElement>) => {
+  const dragStartWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragStart) {
       const itemId = dragRef.current.id;
       e.dataTransfer.setData("text/plain", itemId);
       dragStart(e, itemId);
     }
-  };
+  }, []);
 
-  const dragOverWrapper = (e: React.DragEvent<HTMLDivElement>) => {
+  const dragOverWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragOver) {
       const itemId = dragRef.current.id;
       e.dataTransfer.dropEffect = "move";
       dragOver(e, itemId);
     }
-  };
+  }, []);
 
-  const dragEndWrapper = (e: React.DragEvent<HTMLDivElement>) => {
+  const dragEndWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     if (dragRef.current && dragEnd) {
       const itemId = dragRef.current.id;
       const element = document.getElementById(itemId);
@@ -47,7 +47,11 @@ export default function DraggableComponent({
         dragEnd(e, elementIds);
       }
     }
-  };
+  }, []);
+
+  const drop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  }, [])
 
   return (
     <div
@@ -58,6 +62,7 @@ export default function DraggableComponent({
       onDragEnd={dragEndWrapper}
       data-index={index}
       onDragOver={dragOverWrapper}
+      onDrop={drop}
       id={id}
       className={styles.draggableContainer}
       onDragLeave={dragLeave}
