@@ -52,53 +52,7 @@ const DragDropContainer = <T,>({
   const currentDraggable = useRef<string>("");
   const prevDragOver = useRef<string>("");
 
-  const dragStart = useCallback((e: any, itemId: string) => {
-    currentDraggable.current = itemId;
-  }, []);
-
-  const dragEnd = useCallback((
-    e: React.DragEvent<HTMLDivElement>,
-    elementIds: string[]
-  ) => {
-    updatedItems(elementIds);
-    if (JSON.stringify(elementIds) === JSON.stringify(itemsKeys)) {
-      resetPlaceholder();
-    }
-  }, []);
-
-  const resetPlaceholder = useCallback(() => {
-    setPlaceHolder(initPlaholderState);
-  }, []);
-
-  const dragOver = useCallback((e: any, itemId: string) => {
-    const target = e.target;
-    if (currentDraggable.current !== target.id) {
-      if (target.dataset.testid?.includes("draggable_div_")) {
-        const { width, height } = target.getBoundingClientRect();
-        const CustomPlaceholder = forwardRef(
-          ({ onDragOver, onDrop }: any, ref: any) => (
-            <div
-              id={target.id}
-              onDragOver={onDragOver}
-              onDrop={onDrop}
-              ref={ref}
-              data-testid={`placeholder_div_${itemId}`}
-              style={{ width, height, border: "3px dashed #000" }}
-            />
-          )
-        );
-        const Placeholder = getPlaceholderMarkup(
-          CustomPlaceholder,
-          currentDraggable.current
-        );
-        insertPlaceholder(target.id as string, Placeholder);
-      }
-    }
-  }, []);
-
-  const dragLeave = useCallback(() => {
-    prevDragOver.current = "";
-  }, []);
+  const itemsKeys = useMemo(() => Object.keys(items), [items]);
 
   const getDirection = useCallback(
     (placeholderId: string, draggableId: string) => {
@@ -108,21 +62,71 @@ const DragDropContainer = <T,>({
       const draggableIndex = itemsKeys?.findIndex((key) => key === draggableId);
       return draggableIndex > placeholderIndex ? "top" : "bottom";
     },
-    []
+    [itemsKeys]
   );
 
-  const insertPlaceholder = useCallback((
-    targetId: string,
-    Placeholder: ({ style, id }: any) => JSX.Element
-  ) => {
-    setPlaceHolder({
-      id: targetId,
-      placeholder: Placeholder,
-      direction: getDirection(targetId, currentDraggable.current),
-    });
+  const insertPlaceholder = useCallback(
+    (targetId: string, Placeholder: ({ style, id }: any) => JSX.Element) => {
+      setPlaceHolder({
+        id: targetId,
+        placeholder: Placeholder,
+        direction: getDirection(targetId, currentDraggable.current),
+      });
+    },
+    [setPlaceHolder, getDirection]
+  );
+
+  const dragStart = useCallback((e: any, itemId: string) => {
+    currentDraggable.current = itemId;
   }, []);
 
-  const itemsKeys = useMemo(() => Object.keys(items), [items]);
+  const resetPlaceholder = useCallback(() => {
+    setPlaceHolder(initPlaholderState);
+  }, [setPlaceHolder]);
+
+  const dragEnd = useCallback(
+    (e: React.DragEvent<HTMLDivElement>, elementIds: string[]) => {
+      if (JSON.stringify(elementIds) === JSON.stringify(itemsKeys)) {
+        resetPlaceholder();
+      } else {
+        updatedItems(elementIds);
+      }
+    },
+    [itemsKeys, resetPlaceholder, updatedItems]
+  );
+
+  const dragOver = useCallback(
+    (e: any, itemId: string) => {
+      const target = e.target;
+      if (currentDraggable.current !== target.id) {
+        if (target.dataset.testid?.includes("draggable_div_")) {
+          const { width, height } = target.getBoundingClientRect();
+          const CustomPlaceholder = forwardRef(
+            ({ onDragOver, onDrop }: any, ref: any) => (
+              <div
+                id={target.id}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                ref={ref}
+                data-testid={`placeholder_div_${itemId}`}
+                style={{ width, height, border: "3px dashed #000" }}
+              />
+            )
+          );
+          const Placeholder = getPlaceholderMarkup(
+            CustomPlaceholder,
+            currentDraggable.current
+          );
+          insertPlaceholder(target.id as string, Placeholder);
+        }
+      }
+    },
+    [insertPlaceholder, getPlaceholderMarkup]
+  );
+
+  const dragLeave = useCallback(() => {
+    prevDragOver.current = "";
+  }, []);
 
   return (
     <Suspense fallback="loading...">
