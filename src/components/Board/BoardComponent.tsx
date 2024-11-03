@@ -1,7 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useBoard } from "../../hooks/useBoard";
 import { memo } from "react";
-import DragDropContainer, { initPlaholderState } from "../Draggable/DragDropContainer";
+import DragDropContainer, { initPlaceholderState } from "../Draggable/DragDropContainer";
 import { BoardItemType } from "../../types/board";
 
 
@@ -49,7 +49,7 @@ const BoardComponent = memo(() => {
       className="flex flex-col p-3 align-top"
     >
       <DragDropContainer<BoardItemType>
-        updatedItems={updateBoard}
+        updateItems={updateBoard}
         items={board}
         render={(item, itemKeys, itemKey, itemIndex, setPlaceHolder) => {
           return (
@@ -68,7 +68,7 @@ const BoardComponent = memo(() => {
                   aria-label="Add a new board item"
                   onClick={() =>
                     addNewBoardItem((id) => {
-                      setPlaceHolder(initPlaholderState);
+                      setPlaceHolder(initPlaceholderState);
                       register(id);
                     })
                   }

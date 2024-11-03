@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { getPlaceholderMarkup } from "./getPlaceholderMarkup";
+import { DragDropContainerProps, PlaceholderProps } from "./model";
 
 const DraggableComponent = lazy(
   () => import("../Draggable/DraggableComponent")
@@ -16,26 +17,7 @@ const DroppableComponent = lazy(
   () => import("../Draggable/DroppableComponent")
 );
 
-type PlaceholderProps = {
-  id: string;
-  placeholder: ({ style, id }: any) => JSX.Element;
-  direction: string;
-};
-
-interface DragDropContainerProps<T> {
-  children?: React.ReactNode;
-  updatedItems: (elementIds: string[]) => void;
-  items: Record<string, T>;
-  render: (
-    items: Record<string, T>,
-    itemsKeys: string[],
-    itemKey: string,
-    itemIndex: number,
-    setPlaceHolder: (placeholder: PlaceholderProps) => void
-  ) => JSX.Element;
-}
-
-export const initPlaholderState = {
+export const initPlaceholderState = {
   id: "",
   placeholder: () => <></>,
   direction: "top",
@@ -43,14 +25,14 @@ export const initPlaholderState = {
 
 const DragDropContainer = <T,>({
   children,
-  updatedItems,
+  updateItems,
   items,
   render,
 }: DragDropContainerProps<T>) => {
   const [placeHolder, setPlaceHolder] =
-    useState<PlaceholderProps>(initPlaholderState);
+    useState<PlaceholderProps>(initPlaceholderState);
   const currentDraggable = useRef<string>("");
-  const prevDragOver = useRef<string>("");
+  const prevDraggable = useRef<string>("");
 
   const itemsKeys = useMemo(() => Object.keys(items), [items]);
 
@@ -81,56 +63,70 @@ const DragDropContainer = <T,>({
   }, []);
 
   const resetPlaceholder = useCallback(() => {
-    setPlaceHolder(initPlaholderState);
-  }, [setPlaceHolder]);
+    if (placeHolder?.id) {
+      setTimeout(() => setPlaceHolder(initPlaceholderState), 1000);
+    }
+  }, [placeHolder?.id, placeHolder?.direction]);
 
   const dragEnd = useCallback(
     (e: React.DragEvent<HTMLDivElement>, elementIds: string[]) => {
-      if (JSON.stringify(elementIds) === JSON.stringify(itemsKeys)) {
-        resetPlaceholder();
-      } else {
-        updatedItems(elementIds);
+      if (JSON.stringify(elementIds) !== JSON.stringify(itemsKeys)) {
+        updateItems(elementIds);
       }
     },
-    [itemsKeys, resetPlaceholder, updatedItems]
+    [itemsKeys, updateItems]
   );
 
   const dragOver = useCallback(
     (e: any, itemId: string) => {
+      e.preventDefault();
       const target = e.target;
-      if (currentDraggable.current !== target.id) {
-        if (target.dataset.testid?.includes("draggable_div_")) {
-          const { width, height } = target.getBoundingClientRect();
-          const CustomPlaceholder = forwardRef(
-            ({ onDragOver, onDrop }: any, ref: any) => (
-              <div
-                id={target.id}
-                onDragOver={onDragOver}
-                onDrop={onDrop}
-                ref={ref}
-                data-testid={`placeholder_div_${itemId}`}
-                style={{ width, height, border: "3px dashed #000" }}
-              />
-            )
-          );
-          const Placeholder = getPlaceholderMarkup(
-            CustomPlaceholder,
-            currentDraggable.current
-          );
-          insertPlaceholder(target.id as string, Placeholder);
-        }
+      if (
+        currentDraggable.current !== target.id &&
+        prevDraggable.current !== target.id &&
+        target.dataset.testid?.includes("draggable_div_")
+      ) {
+        const { width, height } = target.getBoundingClientRect();
+        const CustomPlaceholder = forwardRef(
+          ({ onDragOver, onDrop }: any, ref: any) => (
+            <div
+              id={target.id}
+              onDragOver={onDragOver}
+              onDrop={onDrop}
+              ref={ref}
+              data-testid={`placeholder_div_${itemId}`}
+              style={{ width, height, border: "3px dashed #000" }}
+            />
+          )
+        );
+        const Placeholder = getPlaceholderMarkup(
+          CustomPlaceholder,
+          currentDraggable.current
+        );
+        prevDraggable.current = target.id;
+        insertPlaceholder(target.id as string, Placeholder);
       }
     },
     [insertPlaceholder, getPlaceholderMarkup]
   );
 
-  const dragLeave = useCallback(() => {
-    prevDragOver.current = "";
-  }, []);
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    currentDraggable.current = "";
+    prevDraggable.current = "";
+  };
+
+  const dragEndDroppable = () => {
+    resetPlaceholder();
+    // console.log("dragEndDroppable", placeHolder);
+  };
 
   return (
     <Suspense fallback="loading...">
-      <DroppableComponent id="boardContainer">
+      <DroppableComponent
+        id="boardContainer"
+        onDrop={onDrop}
+        onDragEnd={dragEndDroppable}
+      >
         {itemsKeys.map((itemKey: string, itemIndex: number) => (
           <React.Fragment key={itemKey}>
             {itemKey === placeHolder.id && placeHolder.direction === "top" ? (
@@ -144,11 +140,9 @@ const DragDropContainer = <T,>({
                 dragStart={dragStart}
                 dragOver={dragOver}
                 dragEnd={dragEnd}
-                dragLeave={dragLeave}
                 key={itemKey}
                 id={itemKey}
                 index={itemIndex}
-                insertPlaceholder={insertPlaceholder}
               >
                 {render(items, itemsKeys, itemKey, itemIndex, setPlaceHolder)}
               </DraggableComponent>

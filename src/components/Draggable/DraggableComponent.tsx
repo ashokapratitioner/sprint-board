@@ -8,50 +8,58 @@ export default function DraggableComponent({
   variant = "none",
   dragStart,
   dragOver,
-  dragLeave,
   dragEnd,
   index,
   children,
 }: DraggableProps) {
   const dragRef = useRef<HTMLDivElement>(null);
 
-  const dragStartWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (dragRef.current && dragStart) {
-      const itemId = dragRef.current.id;
-      e.dataTransfer.setData("text/plain", itemId);
-      dragStart(e, itemId);
-    }
-  }, []);
-
-  const dragOverWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (dragRef.current && dragOver) {
-      const itemId = dragRef.current.id;
-      e.dataTransfer.dropEffect = "move";
-      dragOver(e, itemId);
-    }
-  }, []);
-
-  const dragEndWrapper = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    if (dragRef.current && dragEnd) {
-      const itemId = dragRef.current.id;
-      const element = document.getElementById(itemId);
-      if (element) {
-        const parentNode = element.parentNode as HTMLDivElement;
-        const elementIds = Array.from(parentNode.children)
-          .filter(
-            (child) =>
-              child.tagName === "DIV" &&
-              child.matches('[data-testid^="draggable_div_"]')
-          )
-          .map((div) => div.id);
-        dragEnd(e, elementIds);
+  const dragStartWrapper = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (dragRef.current && dragStart) {
+        const itemId = dragRef.current.id;
+        e.dataTransfer.setData("text/plain", itemId);
+        dragStart(e, itemId);
       }
-    }
-  }, []);
+    },
+    [dragStart]
+  );
+
+  const dragOverWrapper = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (dragRef.current && dragOver) {
+        const itemId = dragRef.current.id;
+        e.dataTransfer.dropEffect = "move";
+        dragOver(e, itemId);
+      }
+    },
+    [dragOver]
+  );
+
+  const dragEndWrapper = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      if (dragRef.current && dragEnd) {
+        const itemId = dragRef.current.id;
+        const element = document.getElementById(itemId);
+        if (element) {
+          const parentNode = element.parentNode as HTMLDivElement;
+          const elementIds = Array.from(parentNode.children)
+            .filter(
+              (child) =>
+                child.tagName === "DIV" &&
+                child.matches('[data-testid^="draggable_div_"]')
+            )
+            .map((div) => div.id);
+          dragEnd(e, elementIds);
+        }
+      }
+    },
+    [dragEnd]
+  );
 
   const drop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-  }, [])
+  }, []);
 
   return (
     <div
@@ -65,7 +73,6 @@ export default function DraggableComponent({
       onDrop={drop}
       id={id}
       className={styles.draggableContainer}
-      onDragLeave={dragLeave}
     >
       <Dots variant={variant} />
       {children}
